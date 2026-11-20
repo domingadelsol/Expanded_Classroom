@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -190,6 +190,19 @@
   }
   .cta-btn:hover{opacity:0.85;}
 
+  .lang-switch{
+    display:inline-flex;align-items:stretch;
+    background:none;border:1px solid var(--border);border-radius:20px;
+    overflow:hidden;
+  }
+  .lang-opt{
+    background:none;border:none;border-radius:0;
+    padding:8px 12px;font-family:inherit;font-size:13px;
+    color:var(--muted);cursor:pointer;
+  }
+  .lang-opt + .lang-opt{border-left:1px solid var(--border);}
+  .lang-opt:hover{background:var(--card-bg);color:var(--fg);}
+  .lang-opt.active{color:var(--fg);font-weight:700;}
   /* Carrusel de fotos */
   .carousel{position:relative;margin:8px 0 36px;}
   .carousel-track{
@@ -350,7 +363,11 @@
     <span data-i18n="brand">Aula Desplegada</span>
   </div>
   <div class="header-controls">
-    <button class="icon-btn" id="langBtn">ES</button>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" class="lang-opt" data-lang="de">DE</button>
+      <button type="button" class="lang-opt" data-lang="es">ES</button>
+      <button type="button" class="lang-opt active" data-lang="en">EN</button>
+    </div>
     <button class="icon-btn" id="themeBtn" data-i18n="dark_mode">Dark Mode</button>
     <button class="hamburger" id="menuBtn" aria-label="menu">
       <span></span><span></span><span></span>
@@ -624,8 +641,8 @@ const translations = {
   }
 };
 
-const langOrder = ["es","de","en"];
-let currentLangIndex = 0;
+const langOrder = ["de","es","en"];
+let currentLangIndex = 2;
 let currentTheme = "light";
 
 function applyLanguage(lang){
@@ -637,14 +654,16 @@ function applyLanguage(lang){
     }
   });
   document.title = translations[lang]["page_title"];
-  document.getElementById("langBtn").textContent = lang.toUpperCase();
+  document.querySelectorAll(".lang-opt").forEach(b=>b.classList.toggle("active", b.dataset.lang===lang));
   const themeKey = currentTheme === "light" ? "dark_mode" : "light_mode";
   document.getElementById("themeBtn").textContent = translations[lang][themeKey];
 }
 
-document.getElementById("langBtn").addEventListener("click", ()=>{
-  currentLangIndex = (currentLangIndex + 1) % langOrder.length;
-  applyLanguage(langOrder[currentLangIndex]);
+document.querySelectorAll(".lang-opt").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    currentLangIndex = langOrder.indexOf(b.dataset.lang);
+    applyLanguage(b.dataset.lang);
+  });
 });
 
 document.getElementById("themeBtn").addEventListener("click", ()=>{
@@ -665,7 +684,7 @@ document.querySelectorAll("nav.dropdown a").forEach(a=>{
 });
 
 document.documentElement.setAttribute("data-theme", "light");
-applyLanguage("es");
+applyLanguage("en");
 
 (function(){
   const root = document.getElementById("photo-carousel");
